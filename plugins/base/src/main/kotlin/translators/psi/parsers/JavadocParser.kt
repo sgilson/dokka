@@ -25,10 +25,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getNextSiblingIgnoringWhitespace
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jsoup.Jsoup
 import org.jsoup.internal.StringUtil
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.Entities
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
+import org.jsoup.nodes.*
 import java.util.*
 
 interface JavaDocumentationParser {
@@ -411,6 +408,7 @@ class JavadocParser(
             } else {
                 node.wholeText.parseHtmlEncodedWithNormalisedSpaces(renderWhiteCharactersAsSpaces = true)
             }).orEmpty()
+            is Comment -> listOf(Text(body = node.outerHtml(), params = DocTag.contentTypeParam("html")))
             is Element -> createBlock(node)
             else -> emptyList()
         }
