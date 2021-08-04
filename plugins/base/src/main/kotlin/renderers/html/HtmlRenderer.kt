@@ -603,22 +603,13 @@ open class HtmlRenderer(
 
 
     override fun FlowContent.buildNavigation(page: PageNode) =
-        div("navigation-wrapper") {
-            id = "navigation-wrapper"
-            div(classes = "breadcrumbs") {
-                val path = locationProvider.ancestors(page).filterNot { it is RendererSpecificPage }.asReversed()
-                if (path.isNotEmpty()) {
-                    buildNavigationElement(path.first(), page)
-                    path.drop(1).forEach { node ->
-                        text("/")
-                        buildNavigationElement(node, page)
-                    }
-                }
-            }
-            div("pull-right d-flex") {
-                filterButtons(page)
-                div {
-                    id = "searchBar"
+        div(classes = "breadcrumbs") {
+            val path = locationProvider.ancestors(page).filterNot { it is RendererSpecificPage }.asReversed()
+            if (path.size > 1) {
+                buildNavigationElement(path.first(), page)
+                path.drop(1).forEach { node ->
+                    text("/")
+                    buildNavigationElement(node, page)
                 }
             }
         }
@@ -803,14 +794,25 @@ open class HtmlRenderer(
                 }
             }
             body {
+                div("navigation-wrapper") {
+                    id = "navigation-wrapper"
+                    div("library-name") {
+                        text(context.configuration.moduleName)  //TODO multimodule
+                    }
+                    context.configuration.moduleVersion?.let { moduleVersion ->
+                        div { text(moduleVersion) }
+                    }
+                    div("pull-right d-flex") {
+                        filterButtons(page)
+                        div {
+                            id = "searchBar"
+                        }
+                    }
+                }
                 div {
                     id = "container"
                     div {
                         id = "leftColumn"
-                        clickableLogo(page, pathToRoot)
-                        div {
-                            id = "paneSearch"
-                        }
                         div {
                             id = "sideMenu"
                         }
